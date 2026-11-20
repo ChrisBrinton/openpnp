@@ -29,6 +29,10 @@ public class PickOffsetCorrection extends AbstractModelObject {
             Configuration.get().addListener(new ConfigurationListener.Adapter() {
                 @Override
                 public void configurationLoaded(Configuration configuration) {
+                    if (configuration.getMachine() == null) {
+                        // A Configuration without a machine, as unit tests create.
+                        return;
+                    }
                     configuration.getMachine().addListener(new MachineListener.Adapter() {
                         @Override
                         public void machineHomed(Machine machine, boolean isHomed) {

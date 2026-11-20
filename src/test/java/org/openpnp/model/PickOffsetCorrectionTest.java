@@ -124,4 +124,11 @@ public class PickOffsetCorrectionTest {
         correction.settle();
         assertEquals(3.0, correction.getOffset().getLinearDistanceTo(0, 0), 1e-9);
     }
+
+    @Test
+    public void createWithAConfigurationThatHasNoMachine() throws Exception {
+        // Unit tests set up a Configuration without a machine.
+        Configuration.initialize();
+        assertFalse(new PickOffsetCorrection.Nudging().isFeedPlaneSet());
+    }
 }
