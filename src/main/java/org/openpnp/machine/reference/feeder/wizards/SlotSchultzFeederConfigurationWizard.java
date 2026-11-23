@@ -52,6 +52,7 @@ import org.openpnp.gui.support.LengthConverter;
 import org.openpnp.gui.support.MessageBoxes;
 import org.openpnp.gui.support.MutableLocationProxy;
 import org.openpnp.gui.support.PartsComboBoxModel;
+import org.openpnp.gui.support.SearchableComboBox;
 import org.openpnp.machine.reference.feeder.SlotSchultzFeeder;
 import org.openpnp.machine.reference.feeder.SlotSchultzFeeder.Bank;
 import org.openpnp.machine.reference.feeder.SlotSchultzFeeder.Feeder;
@@ -296,6 +297,7 @@ extends AbstractConfigurationWizard {
         feederPanel.add(feederPartCb, "4, 6, 3, 1");
         feederPartCb.setModel(new PartsComboBoxModel());
         feederPartCb.setRenderer(new IdentifiableListCellRenderer<Part>());
+        SearchableComboBox.installForParts(feederPartCb);
 
         JPanel panelActuator = new JPanel();
         panelActuator.setBorder(new TitledBorder(null,

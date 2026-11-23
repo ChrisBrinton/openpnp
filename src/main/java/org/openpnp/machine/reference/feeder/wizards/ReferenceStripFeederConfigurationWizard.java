@@ -61,6 +61,7 @@ import org.openpnp.gui.support.LengthConverter;
 import org.openpnp.gui.support.MessageBoxes;
 import org.openpnp.gui.support.MutableLocationProxy;
 import org.openpnp.gui.support.PartsComboBoxModel;
+import org.openpnp.gui.support.SearchableComboBox;
 import org.openpnp.machine.reference.camera.BufferedImageCamera;
 import org.openpnp.machine.reference.feeder.ReferenceStripFeeder;
 import org.openpnp.model.Board;
@@ -181,6 +182,7 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
         comboBoxPart = new JComboBox();
         comboBoxPart.setModel(new PartsComboBoxModel());
         comboBoxPart.setRenderer(new IdentifiableListCellRenderer<Part>());
+        SearchableComboBox.installForParts(comboBoxPart);
         panelPart.add(comboBoxPart, "4, 2, 3, 1, left, default");
 
         comboBoxPart.addActionListener(new ActionListener() {

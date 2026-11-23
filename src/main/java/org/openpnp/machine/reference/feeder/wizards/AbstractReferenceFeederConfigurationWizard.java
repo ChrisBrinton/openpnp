@@ -35,6 +35,7 @@ import org.openpnp.gui.support.IntegerConverter;
 import org.openpnp.gui.support.LengthConverter;
 import org.openpnp.gui.support.MutableLocationProxy;
 import org.openpnp.gui.support.PartsComboBoxModel;
+import org.openpnp.gui.support.SearchableComboBox;
 import org.openpnp.machine.reference.ReferenceFeeder;
 import org.openpnp.model.Configuration;
 import org.openpnp.model.Part;
@@ -117,6 +118,7 @@ public abstract class AbstractReferenceFeederConfigurationWizard
         JLabel lblPart = new JLabel(Translations.getString("AbstractReferenceFeederConfigurationWizard.GeneralPanel.PartLabel.text")); //$NON-NLS-1$
         panelPart.add(lblPart, "2, 2, right, default");
         comboBoxPart.setRenderer(new IdentifiableListCellRenderer<Part>());
+        SearchableComboBox.installForParts(comboBoxPart);
         panelPart.add(comboBoxPart, "4, 2, left, default");
         
         JLabel lblRetryCount = new JLabel(Translations.getString("AbstractReferenceFeederConfigurationWizard.GeneralPanel.FeedRetryCountLabel.text")); //$NON-NLS-1$

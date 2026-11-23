@@ -47,6 +47,7 @@ import org.openpnp.gui.support.LengthConverter;
 import org.openpnp.gui.support.MessageBoxes;
 import org.openpnp.gui.support.MutableLocationProxy;
 import org.openpnp.gui.support.PartsComboBoxModel;
+import org.openpnp.gui.support.SearchableComboBox;
 import org.openpnp.machine.reference.feeder.ReferenceRotatedTrayFeeder;
 import org.openpnp.model.Configuration;
 import org.openpnp.model.Length;
@@ -153,6 +154,7 @@ public class ReferenceRotatedTrayFeederConfigurationWizard extends AbstractConfi
         JLabel lblPart = new JLabel(Translations.getString("ReferenceRotatedTrayFeederConfigurationWizard.Part")); //$NON-NLS-1$
         panelPart.add(lblPart, "2, 2, right, default"); //$NON-NLS-1$
         comboBoxPart.setRenderer(new IdentifiableListCellRenderer<Part>());
+        SearchableComboBox.installForParts(comboBoxPart);
         panelPart.add(comboBoxPart, "4, 2, left, default"); //$NON-NLS-1$
 
         JLabel lblRetryCount = new JLabel(Translations.getString("ReferenceRotatedTrayFeederConfigurationWizard.FeedRetryCount")); //$NON-NLS-1$

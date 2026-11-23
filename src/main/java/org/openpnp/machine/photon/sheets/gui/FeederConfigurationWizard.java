@@ -26,6 +26,7 @@ import org.openpnp.gui.support.IntegerConverter;
 import org.openpnp.gui.support.LengthConverter;
 import org.openpnp.gui.support.MutableLocationProxy;
 import org.openpnp.gui.support.PartsComboBoxModel;
+import org.openpnp.gui.support.SearchableComboBox;
 import org.openpnp.machine.photon.PhotonFeeder;
 import org.openpnp.model.Configuration;
 import org.openpnp.model.Part;
@@ -147,6 +148,7 @@ public class FeederConfigurationWizard extends AbstractConfigurationWizard {
 		partPanel.add(partCb, "4, 2, 5, 1, fill, default"); //$NON-NLS-1$
 		partCb.setModel(new PartsComboBoxModel());
         partCb.setRenderer(new IdentifiableListCellRenderer<Part>());
+        SearchableComboBox.installForParts(partCb);
 		
 		JLabel partPitchLabel = new JLabel(Translations.getString("FeederConfigurationWizard.PartPanel.partPitchLabel.text")); //$NON-NLS-1$
 		partPitchLabel.setToolTipText(Translations.getString(
