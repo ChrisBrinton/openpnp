@@ -142,7 +142,7 @@ public class JobPlacementsPanel extends JPanel {
         configuration = Configuration.get();
         
         topLevelSingleInstanceActionGroup = new ActionGroup(newAction, removeAction, 
-                setTypeAction, setSideAction);
+                setTypeAction, setSideAction, substitutePartAction);
         topLevelSingleInstanceActionGroup.setEnabled(false);
 
         editFeederActionGroup = new ActionGroup(editPlacementFeederAction);
@@ -381,6 +381,11 @@ public class JobPlacementsPanel extends JPanel {
         JButton btnEditFeeder = new JButton(editPlacementFeederAction);
         btnEditFeeder.setHideActionText(true);
         toolBarPlacements.add(btnEditFeeder);
+
+        toolBarPlacements.addSeparator();
+        JButton btnSubstitutePart = new JButton(substitutePartAction);
+        btnSubstitutePart.setHideActionText(true);
+        toolBarPlacements.add(btnSubstitutePart);
 
         JPanel panel_1 = new JPanel();
         panel.add(panel_1, BorderLayout.EAST);
@@ -758,6 +763,26 @@ public class JobPlacementsPanel extends JPanel {
         public void actionPerformed(ActionEvent arg0) {
             Placement placement = getSelection();
             MainFrame.get().getFeedersTab().showFeederForPart(placement.getPart());
+        }
+    };
+
+    public final Action substitutePartAction = new AbstractAction() {
+        {
+            putValue(SMALL_ICON, Icons.partSubstitute);
+            putValue(NAME, Translations.getString("JobPlacementsPanel.Action.SubstitutePart")); //$NON-NLS-1$
+            putValue(SHORT_DESCRIPTION, Translations.getString("JobPlacementsPanel.Action.SubstitutePart.Description")); //$NON-NLS-1$
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            // Enabled only when the placements are edited through their definition (a top level
+            // board used once in the job), as for the other placement editing actions.
+            SubstitutePartDialog.show(JobPlacementsPanel.this,
+                    boardOrPanelLocation.getPlacementsHolder().getName(),
+                    boardOrPanelLocation.getPlacementsHolder().getPlacements(), () -> {
+                        tableModel.fireTableDataChanged();
+                        updateActivePlacements();
+                    });
         }
     };
 

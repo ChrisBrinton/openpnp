@@ -1,6 +1,7 @@
 package org.openpnp.machine.photon.sheets.gui;
 
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -11,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.beansbinding.AutoBinding;
@@ -26,8 +28,10 @@ import org.openpnp.gui.support.IntegerConverter;
 import org.openpnp.gui.support.LengthConverter;
 import org.openpnp.gui.support.MutableLocationProxy;
 import org.openpnp.gui.support.PartsComboBoxModel;
+import org.openpnp.gui.support.SearchableComboBox;
 import org.openpnp.machine.photon.PhotonFeeder;
 import org.openpnp.model.Configuration;
+import org.openpnp.model.Location;
 import org.openpnp.model.Part;
 import org.openpnp.util.UiUtils;
 import org.openpnp.util.UiUtils.Thrunnable;
@@ -59,6 +63,12 @@ public class FeederConfigurationWizard extends AbstractConfigurationWizard {
 	private final JLabel moveWhileFeedingLabel;
 	private final JCheckBox moveWhileFeedingCheckBox;
 	private final LocationButtonsPanel slotLocationPanel;
+	private final JLabel slotLocationStatusLabel;
+	private final JButton slotLocationUndoButton;
+	private LocationFeedback slotLocationFeedback;
+	private final JLabel offsetStatusLabel;
+	private final JButton offsetUndoButton;
+	private LocationFeedback offsetFeedback;
 
 	/**
 	 * Create the panel.
@@ -147,6 +157,7 @@ public class FeederConfigurationWizard extends AbstractConfigurationWizard {
 		partPanel.add(partCb, "4, 2, 5, 1, fill, default"); //$NON-NLS-1$
 		partCb.setModel(new PartsComboBoxModel());
         partCb.setRenderer(new IdentifiableListCellRenderer<Part>());
+        SearchableComboBox.installForParts(partCb);
 		
 		JLabel partPitchLabel = new JLabel(Translations.getString("FeederConfigurationWizard.PartPanel.partPitchLabel.text")); //$NON-NLS-1$
 		partPitchLabel.setToolTipText(Translations.getString(
@@ -213,6 +224,10 @@ public class FeederConfigurationWizard extends AbstractConfigurationWizard {
 				FormSpecs.DEFAULT_ROWSPEC,
 				FormSpecs.RELATED_GAP_ROWSPEC,
 				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
 				FormSpecs.RELATED_GAP_ROWSPEC,}));
 		
 		JLabel xOffsetLabel = new JLabel(Translations.getString("CommonWords.X")); //$NON-NLS-1$
@@ -251,38 +266,74 @@ public class FeederConfigurationWizard extends AbstractConfigurationWizard {
 
 		slotLocationPanel = new LocationButtonsPanel(xSlotTf, ySlotTf, zSlotTf, rotSlotTf);
 		locationPanel.add(slotLocationPanel, "12, 4, left, top"); //$NON-NLS-1$
+
+		// The slot location and part offset apply as you type (see LocationFeedback); each row
+		// has a status line under it saying so.
+		slotLocationStatusLabel = new JLabel();
+		slotLocationUndoButton = new JButton();
+		locationPanel.add(createStatusPanel(slotLocationStatusLabel, slotLocationUndoButton),
+				"4, 6, 9, 1, left, center"); //$NON-NLS-1$
 		
 		JLabel offsetLabel = new JLabel(Translations.getString("FeederConfigurationWizard.LocationPanel.offsetLabel.text")); //$NON-NLS-1$
 		offsetLabel.setToolTipText(Translations.getString(
 				"FeederConfigurationWizard.LocationPanel.offsetLabel.toolTipText")); //$NON-NLS-1$
-		locationPanel.add(offsetLabel, "2, 6, right, center"); //$NON-NLS-1$
+		locationPanel.add(offsetLabel, "2, 8, right, center"); //$NON-NLS-1$
 		
 		xOffsetTf = new JTextField();
-		locationPanel.add(xOffsetTf, "4, 6, left, center"); //$NON-NLS-1$
+		locationPanel.add(xOffsetTf, "4, 8, left, center"); //$NON-NLS-1$
 		xOffsetTf.setColumns(10);
 		
 		yOffsetTf = new JTextField();
-		locationPanel.add(yOffsetTf, "6, 6, left, center"); //$NON-NLS-1$
+		locationPanel.add(yOffsetTf, "6, 8, left, center"); //$NON-NLS-1$
 		yOffsetTf.setColumns(10);
 		
 		zOffsetTf = new JTextField();
-		locationPanel.add(zOffsetTf, "8, 6, left, center"); //$NON-NLS-1$
+		locationPanel.add(zOffsetTf, "8, 8, left, center"); //$NON-NLS-1$
 		zOffsetTf.setColumns(10);
 		
 		rotOffsetTf = new JTextField();
-		locationPanel.add(rotOffsetTf, "10, 6, left, center"); //$NON-NLS-1$
+		locationPanel.add(rotOffsetTf, "10, 8, left, center"); //$NON-NLS-1$
 		rotOffsetTf.setColumns(10);
 
 		offsetLocationPanel = new LocationButtonsPanel(xOffsetTf, yOffsetTf, zOffsetTf, rotOffsetTf);
-		locationPanel.add(offsetLocationPanel, "12, 6, left, top"); //$NON-NLS-1$
+		locationPanel.add(offsetLocationPanel, "12, 8, left, top"); //$NON-NLS-1$
+
+		offsetStatusLabel = new JLabel();
+		offsetUndoButton = new JButton();
+		locationPanel.add(createStatusPanel(offsetStatusLabel, offsetUndoButton),
+				"4, 10, 9, 1, left, center"); //$NON-NLS-1$
 
 		moveWhileFeedingLabel = new JLabel(Translations.getString("FeederConfigurationWizard.LocationPanel.moveWhileFeedingLabel.text"));
-		locationPanel.add(moveWhileFeedingLabel, "2, 8, right, default"); //$NON-NLS-1$
+		locationPanel.add(moveWhileFeedingLabel, "2, 12, right, default"); //$NON-NLS-1$
 		moveWhileFeedingLabel.setToolTipText(Translations.getString("FeederConfigurationWizard.LocationPanel.moveWhileFeedingLabel.toolTipText"));
 
 		moveWhileFeedingCheckBox = new JCheckBox();
-		locationPanel.add(moveWhileFeedingCheckBox, "4, 8, left, default"); //$NON-NLS-1$
+		locationPanel.add(moveWhileFeedingCheckBox, "4, 12, left, default"); //$NON-NLS-1$
 		moveWhileFeedingCheckBox.setToolTipText(Translations.getString("FeederConfigurationWizard.LocationPanel.moveWhileFeedingLabel.toolTipText"));
+	}
+
+	/**
+	 * Status line for a row of location fields, indented so that its icon lines up with the text
+	 * in the fields above it.
+	 */
+	private JPanel createStatusPanel(JLabel statusLabel, JButton undoButton) {
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+		panel.setBorder(new EmptyBorder(0, xSlotTf.getInsets().left, 0, 0));
+		panel.add(statusLabel);
+		panel.add(undoButton);
+		return panel;
+	}
+
+	private static void addLocationFields(LocationFeedback feedback, JTextField x, AutoBinding xBinding,
+			JTextField y, AutoBinding yBinding, JTextField z, AutoBinding zBinding,
+			JTextField rotation, AutoBinding rotationBinding) {
+		feedback.addField(x, Translations.getString("CommonWords.X"), Location::getX, xBinding); //$NON-NLS-1$
+		feedback.addField(y, Translations.getString("CommonWords.Y"), Location::getY, yBinding); //$NON-NLS-1$
+		feedback.addField(z, Translations.getString("FeederConfigurationWizard.LocationPanel.ZLabel.text"), //$NON-NLS-1$
+				Location::getZ, zBinding);
+		feedback.addField(rotation,
+				Translations.getString("FeederConfigurationWizard.LocationPanel.rotationOffsetLabel.text"), //$NON-NLS-1$
+				Location::getRotation, rotationBinding);
 	}
 
 	AutoBinding<PhotonFeeder, Object, SlotProxy, Object> binding;
@@ -291,6 +342,10 @@ public class FeederConfigurationWizard extends AbstractConfigurationWizard {
 	public void dispose() {
 	    super.dispose();
 	    binding.unbind();
+	    if (slotLocationFeedback != null) {
+	        slotLocationFeedback.dispose();
+	        offsetFeedback.dispose();
+	    }
 	}
 	
 	@Override
@@ -335,18 +390,32 @@ public class FeederConfigurationWizard extends AbstractConfigurationWizard {
 
 		MutableLocationProxy pickLocation = new MutableLocationProxy();
 		bind(AutoBinding.UpdateStrategy.READ_WRITE, slotProxy, "location", pickLocation, "location"); //$NON-NLS-1$ //$NON-NLS-2$
-		bind(AutoBinding.UpdateStrategy.READ_WRITE, pickLocation, "lengthX", xSlotTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
-		bind(AutoBinding.UpdateStrategy.READ_WRITE, pickLocation, "lengthY", ySlotTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
-		bind(AutoBinding.UpdateStrategy.READ_WRITE, pickLocation, "lengthZ", zSlotTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
-		bind(AutoBinding.UpdateStrategy.READ_WRITE, pickLocation, "rotation", rotSlotTf, "text", doubleConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		AutoBinding xSlotBinding = bind(AutoBinding.UpdateStrategy.READ_WRITE, pickLocation, "lengthX", xSlotTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		AutoBinding ySlotBinding = bind(AutoBinding.UpdateStrategy.READ_WRITE, pickLocation, "lengthY", ySlotTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		AutoBinding zSlotBinding = bind(AutoBinding.UpdateStrategy.READ_WRITE, pickLocation, "lengthZ", zSlotTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		AutoBinding rotSlotBinding = bind(AutoBinding.UpdateStrategy.READ_WRITE, pickLocation, "rotation", rotSlotTf, "text", doubleConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		slotLocationFeedback = new LocationFeedback(slotProxy, slotProxy, "location", //$NON-NLS-1$
+				slotProxy::getLocation, slotProxy::setLocation,
+				"FeederConfigurationWizard.SlotLocationFeedback", //$NON-NLS-1$
+				slotLocationStatusLabel, slotLocationUndoButton);
+		addLocationFields(slotLocationFeedback, xSlotTf, xSlotBinding, ySlotTf, ySlotBinding,
+				zSlotTf, zSlotBinding, rotSlotTf, rotSlotBinding);
 		bind(AutoBinding.UpdateStrategy.READ, pickLocation, "location", offsetLocationPanel, "baseLocation"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		MutableLocationProxy offsets = new MutableLocationProxy();
-		addWrappedBinding(feeder, "offset", offsets, "location"); //$NON-NLS-1$ //$NON-NLS-2$
-		bind(AutoBinding.UpdateStrategy.READ_WRITE, offsets, "lengthX", xOffsetTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
-		bind(AutoBinding.UpdateStrategy.READ_WRITE, offsets, "lengthY", yOffsetTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
-		bind(AutoBinding.UpdateStrategy.READ_WRITE, offsets, "lengthZ", zOffsetTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
-		bind(AutoBinding.UpdateStrategy.READ_WRITE, offsets, "rotation", rotOffsetTf, "text", doubleConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		// Applies as you type, like the slot location above it, so the whole Location box behaves
+		// the same way.
+		bind(AutoBinding.UpdateStrategy.READ_WRITE, feeder, "offset", offsets, "location"); //$NON-NLS-1$ //$NON-NLS-2$
+		AutoBinding xOffsetBinding = bind(AutoBinding.UpdateStrategy.READ_WRITE, offsets, "lengthX", xOffsetTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		AutoBinding yOffsetBinding = bind(AutoBinding.UpdateStrategy.READ_WRITE, offsets, "lengthY", yOffsetTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		AutoBinding zOffsetBinding = bind(AutoBinding.UpdateStrategy.READ_WRITE, offsets, "lengthZ", zOffsetTf, "text", lengthConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		AutoBinding rotOffsetBinding = bind(AutoBinding.UpdateStrategy.READ_WRITE, offsets, "rotation", rotOffsetTf, "text", doubleConverter); //$NON-NLS-1$ //$NON-NLS-2$
+		offsetFeedback = new LocationFeedback(slotProxy, feeder, "offset", //$NON-NLS-1$
+				feeder::getOffset, feeder::setOffset,
+				"FeederConfigurationWizard.OffsetFeedback", //$NON-NLS-1$
+				offsetStatusLabel, offsetUndoButton);
+		addLocationFields(offsetFeedback, xOffsetTf, xOffsetBinding, yOffsetTf, yOffsetBinding,
+				zOffsetTf, zOffsetBinding, rotOffsetTf, rotOffsetBinding);
 
 		addWrappedBinding(feeder, "moveWhileFeeding", moveWhileFeedingCheckBox, "selected"); //$NON-NLS-1$ //$NON-NLS-2$
 	}

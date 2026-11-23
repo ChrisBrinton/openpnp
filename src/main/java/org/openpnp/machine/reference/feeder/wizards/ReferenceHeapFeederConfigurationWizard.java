@@ -59,6 +59,7 @@ import org.openpnp.gui.support.JBindings.Wrapper;
 import org.openpnp.gui.support.LengthConverter;
 import org.openpnp.gui.support.MessageBoxes;
 import org.openpnp.gui.support.MutableLocationProxy;
+import org.openpnp.gui.support.SearchableComboBox;
 import org.openpnp.machine.reference.feeder.ReferenceHeapFeeder;
 import org.openpnp.machine.reference.feeder.ReferenceHeapFeeder.DropBox;
 import org.openpnp.model.Configuration;
@@ -289,6 +290,7 @@ public class ReferenceHeapFeederConfigurationWizard
         cbDummyPartForUnknownParts = new JComboBox<Part>();
         cbDummyPartForUnknownParts.setModel(new PartsComboBoxModel());
         cbDummyPartForUnknownParts.setRenderer(new IdentifiableListCellRenderer<Part>());
+        SearchableComboBox.installForParts(cbDummyPartForUnknownParts);
         cbDummyPartForUnknownParts.setToolTipText(Translations.getString(
                 "ReferenceHeapFeederConfigurationWizard.DummyPartComboBox.toolTipText")); //$NON-NLS-1$
         dropBoxPanel.add(cbDummyPartForUnknownParts, "4, 10, fill, default");

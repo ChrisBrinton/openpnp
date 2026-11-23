@@ -47,6 +47,7 @@ import org.openpnp.gui.support.IntegerConverter;
 import org.openpnp.gui.support.LengthConverter;
 import org.openpnp.gui.support.MutableLocationProxy;
 import org.openpnp.gui.support.PartsComboBoxModel;
+import org.openpnp.gui.support.SearchableComboBox;
 import org.openpnp.machine.reference.feeder.BlindsFeeder;
 import org.openpnp.machine.reference.feeder.BlindsFeeder.OcrAction;
 import org.openpnp.model.Configuration;
@@ -111,6 +112,7 @@ public class BlindsFeederConfigurationWizard extends AbstractConfigurationWizard
         comboBoxPart = new JComboBox();
         comboBoxPart.setModel(new PartsComboBoxModel());
         comboBoxPart.setRenderer(new IdentifiableListCellRenderer<Part>());
+        SearchableComboBox.installForParts(comboBoxPart);
         panelPart.add(comboBoxPart, "4, 2, 7, 1, left, default");
         
         btnOcrDetect = new JButton(performOcrAction);

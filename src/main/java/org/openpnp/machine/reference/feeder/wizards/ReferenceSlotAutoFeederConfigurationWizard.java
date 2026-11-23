@@ -43,6 +43,7 @@ import org.openpnp.gui.components.ComponentDecorators;
 import org.openpnp.gui.components.LocationButtonsPanel;
 import org.openpnp.gui.support.*;
 import org.openpnp.gui.support.JBindings.Wrapper;
+import org.openpnp.gui.support.SearchableComboBox;
 import org.openpnp.machine.reference.feeder.ReferenceSlotAutoFeeder;
 import org.openpnp.machine.reference.feeder.ReferenceSlotAutoFeeder.Bank;
 import org.openpnp.machine.reference.feeder.ReferenceSlotAutoFeeder.Feeder;
@@ -249,6 +250,7 @@ public class ReferenceSlotAutoFeederConfigurationWizard
         feederPanel.add(feederPartCb, "4, 6, 3, 1");
         feederPartCb.setModel(new PartsComboBoxModel());
         feederPartCb.setRenderer(new IdentifiableListCellRenderer<Part>());
+        SearchableComboBox.installForParts(feederPartCb);
 
         JPanel panelActuator = new JPanel();
         panelActuator.setBorder(new TitledBorder(null,
