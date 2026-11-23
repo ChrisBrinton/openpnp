@@ -143,7 +143,7 @@ public class PhotonFeeder extends ReferenceFeeder implements PickOffsetCorrectab
         Object oldValue = this.offset;
         this.offset = offsets;
         pickOffsetCorrection.reset();
-        firePropertyChange("offsets", oldValue, offsets);
+        firePropertyChange("offset", oldValue, offsets);
     }
 
     public Location getOffset() {
