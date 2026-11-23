@@ -65,6 +65,7 @@ public class Icons {
     
 
     public static Icon partAlign = getIcon("/icons/part-align.svg");
+    public static Icon partSubstitute = getIcon("/icons/part-substitute.svg");
 
     public static Icon arrowUp = getIcon("/icons/arrow-up.svg");
     public static Icon arrowDown = getIcon("/icons/arrow-down.svg");

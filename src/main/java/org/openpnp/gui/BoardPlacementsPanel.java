@@ -350,6 +350,11 @@ public class BoardPlacementsPanel extends JPanel {
         btnViewer.setHideActionText(true);
         viewerAction.setEnabled(false);
         toolBarPlacements.add(btnViewer);
+
+        JButton btnSubstitutePart = new JButton(substitutePartAction);
+        btnSubstitutePart.setHideActionText(true);
+        substitutePartAction.setEnabled(false);
+        toolBarPlacements.add(btnSubstitutePart);
         
         JPanel panel_1 = new JPanel();
         panel.add(panel_1, BorderLayout.EAST);
@@ -437,6 +442,7 @@ public class BoardPlacementsPanel extends JPanel {
         newAction.setEnabled(board != null);
         importAction.setEnabled(board != null);
         viewerAction.setEnabled(board != null);
+        substitutePartAction.setEnabled(board != null);
         if (boardViewer != null) {
             boardViewer.setPlacementsHolder(board);
         }
@@ -674,6 +680,20 @@ public class BoardPlacementsPanel extends JPanel {
                 boardViewer.setExtendedState(Frame.NORMAL);
             }
             boardViewer.setVisible(true);
+        }
+    };
+
+    public final Action substitutePartAction = new AbstractAction() {
+        {
+            putValue(SMALL_ICON, Icons.partSubstitute);
+            putValue(NAME, Translations.getString("BoardsPanel.BoardPlacements.Action.SubstitutePart")); //$NON-NLS-1$
+            putValue(SHORT_DESCRIPTION, Translations.getString("BoardsPanel.BoardPlacements.Action.SubstitutePart.Description")); //$NON-NLS-1$
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            SubstitutePartDialog.show(BoardPlacementsPanel.this, board.getName(),
+                    board.getPlacements(), () -> tableModel.fireTableDataChanged());
         }
     };
 
